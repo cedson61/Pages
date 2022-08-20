@@ -31,6 +31,8 @@ import UIKit
 public struct Pages: View {
 
     @Binding var currentPage: Int
+    var isScrollable: Bool
+
     var pages: [AnyView]
 
     var navigationOrientation: UIPageViewController.NavigationOrientation
@@ -72,6 +74,7 @@ public struct Pages: View {
     */
     public init(
         currentPage: Binding<Int>,
+        isScrollable: Bool = true,
         navigationOrientation: UIPageViewController.NavigationOrientation = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         bounce: Bool = true,
@@ -81,6 +84,7 @@ public struct Pages: View {
         controlAlignment: Alignment = .bottom,
         @PagesBuilder pages: () -> [AnyView]
     ) {
+        self.isScrollable = isScrollable
         self.navigationOrientation = navigationOrientation
         self.transitionStyle = transitionStyle
         self.bounce = bounce
@@ -90,12 +94,14 @@ public struct Pages: View {
         self.controlAlignment = controlAlignment
         self.pages = pages()
         self._currentPage = currentPage
+        
     }
 
     public var body: some View {
         ZStack(alignment: self.controlAlignment) {
             PageViewController(
                 currentPage: $currentPage,
+                isScrollable: isScrollable,
                 navigationOrientation: navigationOrientation,
                 transitionStyle: transitionStyle,
                 bounce: bounce,

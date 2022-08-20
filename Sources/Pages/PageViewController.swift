@@ -31,12 +31,13 @@ import UIKit
 struct PageViewController: UIViewControllerRepresentable {
 
     @Binding var currentPage: Int
-
+    var isScrollable: Bool
     var navigationOrientation: UIPageViewController.NavigationOrientation
     var transitionStyle: UIPageViewController.TransitionStyle
     var bounce: Bool
     var wrap: Bool
     var controllers: [UIViewController]
+    
 
     func makeCoordinator() -> PagesCoordinator {
         PagesCoordinator(self)
@@ -54,6 +55,12 @@ struct PageViewController: UIViewControllerRepresentable {
         for view in pageViewController.view.subviews {
             if let scrollView = view as? UIScrollView {
                 scrollView.delegate = context.coordinator
+                if !isScrollable {
+                    print("scroll disabled!")
+                    scrollView.isScrollEnabled = false
+                } else {
+                    print("scroll enabled!")
+                }
                 break
             }
         }
