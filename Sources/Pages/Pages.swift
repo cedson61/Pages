@@ -27,12 +27,12 @@ import SwiftUI
 import UIKit
 
 /// A paging view that generates user-defined static pages.
-@available(iOS 13.0, *)
+@available(iOS 14.0, *)
 public struct Pages: View {
 
     @Binding var currentPage: Int
-    var isScrollable: Bool
-
+    @Binding var isScrollable: Bool
+        
     var pages: [AnyView]
 
     var navigationOrientation: UIPageViewController.NavigationOrientation
@@ -74,7 +74,7 @@ public struct Pages: View {
     */
     public init(
         currentPage: Binding<Int>,
-        isScrollable: Bool = true,
+        isScrollable: Binding<Bool>,
         navigationOrientation: UIPageViewController.NavigationOrientation = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         bounce: Bool = true,
@@ -84,7 +84,7 @@ public struct Pages: View {
         controlAlignment: Alignment = .bottom,
         @PagesBuilder pages: () -> [AnyView]
     ) {
-        self.isScrollable = isScrollable
+        self._isScrollable = isScrollable
         self.navigationOrientation = navigationOrientation
         self.transitionStyle = transitionStyle
         self.bounce = bounce
@@ -101,7 +101,7 @@ public struct Pages: View {
         ZStack(alignment: self.controlAlignment) {
             PageViewController(
                 currentPage: $currentPage,
-                isScrollable: isScrollable,
+                isScrollable: $isScrollable,
                 navigationOrientation: navigationOrientation,
                 transitionStyle: transitionStyle,
                 bounce: bounce,
@@ -122,3 +122,4 @@ public struct Pages: View {
         }
     }
 }
+

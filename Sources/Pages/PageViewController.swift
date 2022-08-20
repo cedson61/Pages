@@ -27,11 +27,12 @@ import SwiftUI
 import UIKit
 
 /// The UIPageViewController in charge of the pages.
-@available(iOS 13.0, *)
+@available(iOS 14.0, *)
 struct PageViewController: UIViewControllerRepresentable {
 
     @Binding var currentPage: Int
-    var isScrollable: Bool
+    @Binding var isScrollable: Bool
+    
     var navigationOrientation: UIPageViewController.NavigationOrientation
     var transitionStyle: UIPageViewController.TransitionStyle
     var bounce: Bool
@@ -40,7 +41,7 @@ struct PageViewController: UIViewControllerRepresentable {
     
 
     func makeCoordinator() -> PagesCoordinator {
-        PagesCoordinator(self)
+        PagesCoordinator(self, isScrollable: $isScrollable)
     }
 
     func makeUIViewController(context: Context) -> UIPageViewController {
@@ -55,12 +56,6 @@ struct PageViewController: UIViewControllerRepresentable {
         for view in pageViewController.view.subviews {
             if let scrollView = view as? UIScrollView {
                 scrollView.delegate = context.coordinator
-                if !isScrollable {
-                    print("scroll disabled!")
-                    scrollView.isScrollEnabled = false
-                } else {
-                    print("scroll enabled!")
-                }
                 break
             }
         }
@@ -81,13 +76,16 @@ struct PageViewController: UIViewControllerRepresentable {
 
 }
 
-@available(iOS 13.0, *)
+@available(iOS 14.0, *)
 class PagesCoordinator: NSObject, UIPageViewControllerDataSource,
                              UIPageViewControllerDelegate {
     var parent: PageViewController
+    
+    var isScrollable: Binding<Bool>
 
-    init(_ pageViewController: PageViewController) {
+    init(_ pageViewController: PageViewController, isScrollable: Binding<Bool>) {
         self.parent = pageViewController
+        self.isScrollable = isScrollable
     }
 
     func pageViewController(
@@ -122,12 +120,30 @@ class PagesCoordinator: NSObject, UIPageViewControllerDataSource,
             parent.currentPage = index
         }
     }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        
+        if(!isScrollable.wrappedValue){
+            let prev = pageViewController.dataSource
+            pageViewController.dataSource = nil
+            pageViewController.dataSource = prev
+        }
+        
+    }
+
+    
+    
+    
 }
 
-@available(iOS 13.0, *)
+@available(iOS 14.0, *)
 extension PagesCoordinator: UIScrollViewDelegate {
+    
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        
+        
         if !parent.bounce {
             if parent.navigationOrientation == .horizontal {
                 disableHorizontalBounce(scrollView)
@@ -140,7 +156,8 @@ extension PagesCoordinator: UIScrollViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         scrollViewDidScroll(scrollView)
     }
-
+    
+    
     private func disableHorizontalBounce(_ scrollView: UIScrollView) {
         if parent.currentPage == 0 && scrollView.contentOffset.x < scrollView.bounds.size.width ||
            parent.currentPage == self.parent.controllers.count - 1 && scrollView.contentOffset.x > scrollView.bounds.size.width {
