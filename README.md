@@ -36,9 +36,10 @@ import Pages
 struct WelcomeView: View {
 
     @State var index: Int = 0
+    @State var scrollable: Bool = true
 
     var body: some View {
-        Pages(currentPage: $index) {
+        Pages(currentPage: $index, isScrollable: $scrollable) {
              Text("Welcome! This is Page 1")
              Text("This is Page 2")
              Text("...and this is Page 3")
@@ -48,31 +49,14 @@ struct WelcomeView: View {
 }
 ```
 
-One can also use Pages with dynamic content:
+main changes for use in field recorder:
 
-```swift
+dynamic content removed and
 
-import Pages
+- `isScrollable`: A binding that can be used to disable/re-enable scrolling on the fly. Must be set to a state variable.
 
-struct Car {
-    var model: String
-}
 
-struct CarsView: View {
-    let cars = [Car(model: "Ford"), Car(model: "Ferrari")]
-    @State var index: Int = 0
-    
-    var body: some View {
-        ModelPages(cars, currentPage: $index) { pageIndex, car in
-            Text("The \(pageIndex) car is a \(car.model)")
-                .padding(50)
-                .foregroundColor(.white)
-                .background(Color.blue)
-                .cornerRadius(10)
-        }
-    }
-}
-```
+
 
 ### How it works
 
@@ -85,6 +69,7 @@ add in a static way using the `Pages` view is 10. If more are needed use a `Mode
 ## Customization
 
 The following aspects of `Pages` can be customized:
+
 
 - `navigationOrientation`: Whether to paginate horizontally or vertically. Default is `.horizontal`.
 
